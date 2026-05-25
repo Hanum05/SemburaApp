@@ -6,6 +6,9 @@
     <title>Sembura - Smart Respiratory Wellness</title>
     <!-- Memuat Tailwind CSS langsung dari CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Memuat Cropper.js untuk fitur potong foto (Crop) -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
     <style>
         /* Sembunyikan scrollbar tapi tetap bisa di-scroll */
         .no-scrollbar::-webkit-scrollbar {
@@ -36,6 +39,10 @@
         @keyframes scan {
             0% { top: 0%; }
             100% { top: 100%; }
+        }
+        /* Kustomisasi Background Cropper agar gelap */
+        .cropper-modal {
+            background-color: rgba(0, 0, 0, 0.8);
         }
     </style>
 </head>
@@ -74,6 +81,11 @@
                     Sudah punya akun? Masuk
                 </button>
             </div>
+            
+            <!-- Tambahan Catatan Medis -->
+            <p class="text-[11px] text-gray-400 mt-auto pt-4 pb-2 text-center px-4">
+                <strong>Catatan:</strong> Web ini bukan pengganti diagnosis medis profesional.
+            </p>
         </div>
 
         <!-- ==================== HOME SCREEN ==================== -->
@@ -82,7 +94,7 @@
                 <!-- Header -->
                 <div class="flex justify-between items-center mb-6">
                     <div>
-                        <h2 class="text-2xl font-bold text-gray-800">Halo, Andi</h2>
+                        <h2 class="text-2xl font-bold text-gray-800">Halo, <span id="home-greeting-name">Hanum</span> 👋</h2>
                     </div>
                     <button class="text-gray-500 p-2 relative">
                         <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9 M13.73 21a2 2 0 0 1-3.46 0" /></svg>
@@ -103,7 +115,7 @@
                 <h4 class="font-bold text-gray-800 mb-3 text-sm">Kondisi Udara Hari Ini</h4>
                 <div onclick="navigateTo('air-quality-screen')" class="bg-white rounded-3xl p-5 shadow-sm border border-gray-100 mb-6 flex justify-between items-center cursor-pointer hover:shadow-md transition-shadow">
                     <div>
-                        <p class="font-semibold text-gray-800">Jakarta</p>
+                        <p class="font-semibold text-gray-800">Malang</p>
                         <p class="text-xs text-gray-500 mb-2">Sedang</p>
                         <div class="flex items-end gap-2">
                             <span class="text-xs text-gray-500 font-bold mb-1">AQI</span>
@@ -115,7 +127,7 @@
                         <div class="text-yellow-400 mb-2">
                             <svg class="w-10 h-10 mx-auto" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v2 M12 20v2 M4.93 4.93l1.41 1.41 M17.66 17.66l1.41 1.41 M2 12h2 M20 12h2 M6.34 17.66l-1.41 1.41 M19.07 4.93l-1.41 1.41 M12 7a5 5 0 0 0-4.54 7.07A4 4 0 0 0 9 22h8a4 4 0 0 0 1-7.87A5 5 0 0 0 12 7z" /></svg>
                         </div>
-                        <p class="font-semibold text-gray-700">28°C</p>
+                        <p class="font-semibold text-gray-700">24°C</p>
                     </div>
                 </div>
 
@@ -143,66 +155,16 @@
                 <!-- Produk Sembura -->
                 <h4 class="font-bold text-gray-800 mb-3 text-sm">Produk Sembura</h4>
                 <div class="bg-[#F0F7F2] rounded-3xl p-3 flex items-center gap-4 cursor-pointer hover:bg-[#E2F0E6] transition-colors">
-                    <img src="https://images.unsplash.com/photo-1607619056574-7b8d3ee536b2?q=80&w=200&auto=format&fit=crop" alt="Product" class="w-16 h-20 object-cover rounded-2xl"/>
+                    <!-- Menggunakan produk.png dengan object-contain agar rasio aslinya menyesuaikan -->
+                    <img src="produk.png" alt="Product" class="w-16 h-auto object-contain rounded-2xl"/>
                     <div class="flex-1">
-                        <h5 class="font-bold text-sm text-gray-800">Nano-Respiratory<br/>Phytotherapy Spray</h5>
-                        <p class="text-[10px] text-gray-500 mt-1">Ekstrak Daun Sembung<br/>(Blumea balsamifera)</p>
+                        <h5 class="font-bold text-sm text-gray-800 leading-tight">Nano-Respiratory<br/>Phytotherapy Spray</h5>
+                        <p class="text-[11px] font-medium text-[#2B5D41] mt-1">Ekstrak Daun Sembung</p>
                     </div>
                     <div class="text-gray-400 mr-2">
                         <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6" /></svg>
                     </div>
                 </div>
-            </div>
-        </div>
-
-        <!-- ==================== SYMPTOMS SCREEN ==================== -->
-        <div id="symptoms-screen" class="app-screen hidden flex-1 bg-white flex-col h-full overflow-hidden">
-            <div class="flex items-center p-4 pt-6">
-                <button onclick="navigateTo('home-screen')" class="p-2 text-gray-700">
-                    <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6" /></svg>
-                </button>
-                <h2 class="flex-1 text-center font-bold text-lg -ml-8">Cek Gejala</h2>
-            </div>
-            <div class="p-6 flex-1 overflow-y-auto">
-                <h3 class="text-xl font-bold text-center mb-2">Bagaimana kondisi pernapasan Anda hari ini?</h3>
-                <p class="text-gray-500 text-sm text-center mb-8">Pilih gejala yang Anda rasakan.</p>
-                <div class="grid grid-cols-3 gap-4 mb-8" id="symptoms-grid">
-                    <!-- Cards will be populated by JS -->
-                </div>
-                <button onclick="submitSymptoms()" class="w-full bg-[#1C4E2A] text-white py-4 rounded-full font-semibold text-sm shadow-md hover:bg-[#153a20] transition-colors active:scale-95">
-                    Lihat Rekomendasi
-                </button>
-                <p class="text-center text-xs text-gray-400 mt-6 bg-gray-50 p-3 rounded-xl">
-                    <strong>Catatan:</strong> Aplikasi ini bukan pengganti diagnosis medis profesional.
-                </p>
-            </div>
-        </div>
-
-        <!-- ==================== SYMPTOMS RESULT SCREEN ==================== -->
-        <div id="symptoms-result-screen" class="app-screen hidden flex-1 bg-[#F0F7F2] flex-col h-full overflow-hidden">
-            <div class="flex items-center p-4 pt-6 bg-white shadow-sm z-10">
-                <button onclick="navigateTo('symptoms-screen')" class="p-2 text-gray-700">
-                    <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6" /></svg>
-                </button>
-                <h2 class="flex-1 text-center font-bold text-lg -ml-8">Hasil & Rekomendasi</h2>
-            </div>
-            <div class="p-6 flex-1 overflow-y-auto flex flex-col items-center">
-                <div class="w-20 h-20 bg-white rounded-full flex items-center justify-center text-4xl shadow-md mb-4" id="result-emoji">🤧</div>
-                <h3 class="text-xl font-bold text-gray-800 mb-1" id="result-title">Gejala: </h3>
-                <div class="bg-white w-full rounded-2xl p-5 shadow-sm mt-6">
-                    <h4 class="font-bold text-[#1C4E2A] mb-3 flex items-center gap-2">
-                        <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /></svg>
-                        Tindakan Disarankan
-                    </h4>
-                    <ul class="text-sm text-gray-600 space-y-3">
-                        <li class="flex items-start gap-2"><span class="text-[#2B5D41] font-bold">•</span>Gunakan Sembura Herbal Spray 2-3 kali sehari.</li>
-                        <li class="flex items-start gap-2"><span class="text-[#2B5D41] font-bold">•</span>Perbanyak minum air putih hangat.</li>
-                        <li class="flex items-start gap-2"><span class="text-[#2B5D41] font-bold">•</span>Gunakan masker jika harus beraktivitas di luar.</li>
-                    </ul>
-                </div>
-                <button onclick="navigateTo('home-screen')" class="w-full mt-auto bg-[#1C4E2A] text-white py-4 rounded-full font-semibold text-sm shadow-md hover:bg-[#153a20] transition-colors">
-                    Selesai
-                </button>
             </div>
         </div>
 
@@ -217,7 +179,7 @@
             </div>
             <div class="p-6 flex-1 overflow-y-auto flex flex-col items-center">
                 <div class="w-full flex justify-between text-sm font-medium mb-8">
-                    <span class="bg-gray-100 px-3 py-1 rounded-full cursor-pointer hover:bg-gray-200">Jakarta ⌵</span>
+                    <span class="bg-gray-100 px-3 py-1 rounded-full cursor-pointer hover:bg-gray-200">Malang ⌵</span>
                     <span class="text-gray-500" id="current-time">Hari Ini, 09.00</span>
                 </div>
                 <!-- Meter UI using CSS borders -->
@@ -249,38 +211,6 @@
             </div>
         </div>
 
-        <!-- ==================== EDUCATION SCREEN ==================== -->
-        <div id="education-screen" class="app-screen hidden flex-1 bg-white flex-col h-full overflow-hidden">
-            <div class="flex items-center p-4 pt-6">
-                <button onclick="navigateTo('home-screen')" class="p-2 text-gray-700">
-                    <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6" /></svg>
-                </button>
-                <h2 class="flex-1 text-center font-bold text-lg -ml-8">Edukasi Herbal</h2>
-            </div>
-            <div class="p-6 flex-1 overflow-y-auto">
-                <img src="https://images.unsplash.com/photo-1555543442-49195a6ee9fb?q=80&w=800&auto=format&fit=crop" alt="Daun Sembung" class="w-full h-48 object-cover rounded-3xl mb-6 shadow-sm"/>
-                <h3 class="text-xl font-bold text-gray-800 mb-1">Daun Sembung</h3>
-                <h4 class="text-sm italic text-gray-500 mb-4">(Blumea balsamifera)</h4>
-                <p class="text-sm text-gray-600 leading-relaxed mb-6">
-                    Mengandung senyawa aktif yang membantu melegakan pernapasan, meredakan batuk, dan mendukung kesehatan saluran pernapasan secara alami.
-                </p>
-                <div class="space-y-4">
-                    <div class="flex items-center gap-4 bg-gray-50 p-3 rounded-2xl">
-                        <div class="w-10 h-10 bg-[#F0F7F2] rounded-full flex items-center justify-center text-[#2B5D41] shrink-0"><svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 20A7 7 0 0 1 4 13c0-3.5 2.5-7.5 7-10 4.5 2.5 7 6.5 7 10a7 7 0 0 1-7 7z" /></svg></div>
-                        <span class="font-semibold text-gray-700 text-sm">Anti-inflamasi alami</span>
-                    </div>
-                    <div class="flex items-center gap-4 bg-gray-50 p-3 rounded-2xl">
-                        <div class="w-10 h-10 bg-[#F0F7F2] rounded-full flex items-center justify-center text-[#2B5D41] shrink-0"><svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /></svg></div>
-                        <span class="font-semibold text-gray-700 text-sm">Antioksidan tinggi</span>
-                    </div>
-                    <div class="flex items-center gap-4 bg-gray-50 p-3 rounded-2xl">
-                        <div class="w-10 h-10 bg-[#F0F7F2] rounded-full flex items-center justify-center text-[#2B5D41] shrink-0"><svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.59 4.59A2 2 0 1 1 11 8H2m10.59 11.41A2 2 0 1 0 14 16H2m15.73-8.27A2.5 2.5 0 1 1 19.5 12H2" /></svg></div>
-                        <span class="font-semibold text-gray-700 text-sm">Membantu melegakan pernapasan</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-
         <!-- ==================== REMINDER SCREEN ==================== -->
         <div id="reminder-screen" class="app-screen hidden flex-1 bg-white flex-col h-full overflow-hidden">
             <div class="flex items-center p-4 pt-6">
@@ -292,7 +222,8 @@
             <div class="p-6 flex-1 overflow-y-auto flex flex-col">
                 <div class="w-full flex justify-center mb-6">
                     <div class="relative w-40 h-40 bg-gray-50 rounded-full flex items-center justify-center border-4 border-[#F0F7F2]">
-                        <img src="https://images.unsplash.com/photo-1607619056574-7b8d3ee536b2?q=80&w=200&auto=format&fit=crop" alt="Spray" class="w-20 h-28 object-cover rounded-xl"/>
+                        <!-- Gambar spray.png menyesuaikan dengan ratio object-contain -->
+                        <img src="spray.png" alt="Spray" class="w-20 h-auto object-contain rounded-xl"/>
                         <div class="absolute bottom-2 right-2 bg-white rounded-full p-2 shadow-md text-[#2B5D41]">
                             <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10" /><path d="M12 6v6l4 2" /></svg>
                         </div>
@@ -323,7 +254,36 @@
             </div>
         </div>
 
-        <!-- ==================== DUMMY SCREENS (RIWAYAT, SCAN, DLL) ==================== -->
+        <!-- ==================== ACCOUNT SCREEN ==================== -->
+        <div id="account-screen" class="app-screen hidden flex-1 bg-[#FAFAFA] flex-col p-6 pb-24 overflow-y-auto">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6">Akun Saya</h2>
+            
+            <div class="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex flex-col items-center mb-6">
+                <!-- Foto Profil dengan Icon Edit -->
+                <div class="relative mb-4">
+                    <div class="w-24 h-24 bg-gray-100 rounded-full overflow-hidden border-4 border-white shadow-md">
+                        <!-- Icon Hijab Gadis URL dari Unsplash -->
+                        <img id="profile-img" src="https://images.unsplash.com/photo-1580489944761-15a19d654956?q=80&w=200&auto=format&fit=crop" alt="User" class="w-full h-full object-cover" />
+                    </div>
+                    <!-- Icon Pensil untuk Edit (Munculkan Modal Edit) -->
+                    <button onclick="openEditOptions()" class="absolute bottom-0 right-0 bg-[#1C4E2A] p-2 rounded-full shadow-lg border-2 border-white text-white hover:bg-[#153a20] transition-colors">
+                        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z" />
+                        </svg>
+                    </button>
+                </div>
+
+                <h3 id="profile-name" class="font-bold text-lg text-gray-800">Hanum</h3>
+                <p class="text-sm text-gray-500">hanum@email.com</p>
+            </div>
+
+            <div class="space-y-2">
+                <button class="w-full bg-white p-4 rounded-2xl text-left text-sm font-semibold flex justify-between items-center shadow-sm border border-gray-100 text-gray-700">Pengaturan Profil <svg class="w-5 h-5 opacity-50" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6" /></svg></button>
+                <button onclick="navigateTo('splash-screen')" class="w-full bg-white p-4 rounded-2xl text-left text-sm font-semibold flex justify-between items-center shadow-sm border border-gray-100 text-red-500 mt-8">Keluar <svg class="w-5 h-5 opacity-50" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6" /></svg></button>
+            </div>
+        </div>
+
+        <!-- ==================== DUMMY SCREENS (RIWAYAT, SCAN, EDUKASI DLL) ==================== -->
         <div id="history-screen" class="app-screen hidden flex-1 bg-[#FAFAFA] flex-col p-6 pb-24 overflow-y-auto">
             <h2 class="text-2xl font-bold text-gray-800 mb-6">Riwayat</h2>
             <div class="space-y-4">
@@ -338,49 +298,49 @@
                 </div>
             </div>
         </div>
-
-        <!-- ==================== SCAN SCREEN (WITH REAL CAMERA) ==================== -->
         <div id="scan-screen" class="app-screen hidden flex-1 bg-black flex-col items-center justify-center p-6 text-white pb-24 relative overflow-hidden">
-            <!-- Video Element untuk Kamera -->
             <video id="camera-stream" class="absolute inset-0 w-full h-full object-cover opacity-70" autoplay playsinline></video>
-            
-            <!-- UI Overlay Scanner -->
             <div class="w-64 h-64 border-2 border-dashed border-white/30 rounded-3xl flex items-center justify-center mb-8 relative z-10 overflow-hidden shadow-[0_0_0_9999px_rgba(0,0,0,0.5)]">
-                <!-- Garis Kamera -->
                 <div class="absolute top-0 left-0 w-8 h-8 border-t-4 border-l-4 border-green-500 rounded-tl-3xl"></div>
                 <div class="absolute top-0 right-0 w-8 h-8 border-t-4 border-r-4 border-green-500 rounded-tr-3xl"></div>
                 <div class="absolute bottom-0 left-0 w-8 h-8 border-b-4 border-l-4 border-green-500 rounded-bl-3xl"></div>
                 <div class="absolute bottom-0 right-0 w-8 h-8 border-b-4 border-r-4 border-green-500 rounded-br-3xl"></div>
-                
-                <!-- Animasi Laser Scanning -->
                 <div class="absolute left-0 right-0 h-0.5 bg-green-500 shadow-[0_0_8px_2px_rgba(34,197,94,0.8)] scanner-laser w-full"></div>
             </div>
-            
             <h2 class="text-xl font-bold mb-2 z-10">Scan Produk Sembura</h2>
             <p class="text-sm text-gray-300 text-center px-8 z-10">Arahkan kamera ke kemasan atau QR produk untuk memverifikasi keaslian.</p>
         </div>
-
-        <!-- ==================== ARTICLE SCREEN ==================== -->
         <div id="article-screen" class="app-screen hidden flex-1 bg-[#FAFAFA] flex-col p-6 pb-24 overflow-y-auto">
             <h2 class="text-2xl font-bold text-gray-800 mb-6">Artikel Herbal</h2>
-            <div class="space-y-4" id="article-list">
-                <!-- Artikel akan di-render di sini lewat JavaScript -->
+            <div class="space-y-4" id="article-list"></div>
+        </div>
+        <div id="education-screen" class="app-screen hidden flex-1 bg-white flex-col h-full overflow-hidden">
+            <div class="flex items-center p-4 pt-6">
+                <button onclick="navigateTo('home-screen')" class="p-2 text-gray-700">
+                    <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6" /></svg>
+                </button>
+                <h2 class="flex-1 text-center font-bold text-lg -ml-8">Edukasi Herbal</h2>
+            </div>
+            <div class="p-6 flex-1 overflow-y-auto">
+                <img src="https://images.unsplash.com/photo-1555543442-49195a6ee9fb?q=80&w=800&auto=format&fit=crop" alt="Daun Sembung" class="w-full h-48 object-cover rounded-3xl mb-6 shadow-sm"/>
+                <h3 class="text-xl font-bold text-gray-800 mb-1">Daun Sembung</h3>
+                <h4 class="text-sm italic text-gray-500 mb-4">(Blumea balsamifera)</h4>
+                <p class="text-sm text-gray-600 leading-relaxed mb-6">Mengandung senyawa aktif yang membantu melegakan pernapasan, meredakan batuk, dan mendukung kesehatan saluran pernapasan secara alami.</p>
+                <div class="space-y-4">
+                    <div class="flex items-center gap-4 bg-gray-50 p-3 rounded-2xl"><div class="w-10 h-10 bg-[#F0F7F2] rounded-full flex items-center justify-center text-[#2B5D41] shrink-0"><svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 20A7 7 0 0 1 4 13c0-3.5 2.5-7.5 7-10 4.5 2.5 7 6.5 7 10a7 7 0 0 1-7 7z" /></svg></div><span class="font-semibold text-gray-700 text-sm">Anti-inflamasi alami</span></div>
+                    <div class="flex items-center gap-4 bg-gray-50 p-3 rounded-2xl"><div class="w-10 h-10 bg-[#F0F7F2] rounded-full flex items-center justify-center text-[#2B5D41] shrink-0"><svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /></svg></div><span class="font-semibold text-gray-700 text-sm">Antioksidan tinggi</span></div>
+                    <div class="flex items-center gap-4 bg-gray-50 p-3 rounded-2xl"><div class="w-10 h-10 bg-[#F0F7F2] rounded-full flex items-center justify-center text-[#2B5D41] shrink-0"><svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.59 4.59A2 2 0 1 1 11 8H2m10.59 11.41A2 2 0 1 0 14 16H2m15.73-8.27A2.5 2.5 0 1 1 19.5 12H2" /></svg></div><span class="font-semibold text-gray-700 text-sm">Membantu melegakan pernapasan</span></div>
+                </div>
             </div>
         </div>
-
-        <div id="account-screen" class="app-screen hidden flex-1 bg-[#FAFAFA] flex-col p-6 pb-24 overflow-y-auto">
-            <h2 class="text-2xl font-bold text-gray-800 mb-6">Akun Saya</h2>
-            <div class="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex flex-col items-center mb-6">
-                <div class="w-20 h-20 bg-gray-200 rounded-full mb-4 overflow-hidden">
-                    <img src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?q=80&w=200&auto=format&fit=crop" alt="User" />
-                </div>
-                <h3 class="font-bold text-lg text-gray-800">Andi Saputra</h3>
-                <p class="text-sm text-gray-500">andi@email.com</p>
-            </div>
-            <div class="space-y-2">
-                <button class="w-full bg-white p-4 rounded-2xl text-left text-sm font-semibold flex justify-between items-center shadow-sm border border-gray-100 text-gray-700">Pengaturan Profil <svg class="w-5 h-5 opacity-50" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6" /></svg></button>
-                <button onclick="navigateTo('splash-screen')" class="w-full bg-white p-4 rounded-2xl text-left text-sm font-semibold flex justify-between items-center shadow-sm border border-gray-100 text-red-500 mt-8">Keluar <svg class="w-5 h-5 opacity-50" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6" /></svg></button>
-            </div>
+        <div id="symptoms-screen" class="app-screen hidden flex-1 bg-white flex-col h-full overflow-hidden">
+            <!-- (Cek gejala logic remains here from previous version, collapsed for brevity but fully functional in script) -->
+            <div class="flex items-center p-4 pt-6"><button onclick="navigateTo('home-screen')" class="p-2 text-gray-700"><svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6" /></svg></button><h2 class="flex-1 text-center font-bold text-lg -ml-8">Cek Gejala</h2></div>
+            <div class="p-6 flex-1 overflow-y-auto"><h3 class="text-xl font-bold text-center mb-2">Bagaimana kondisi pernapasan Anda hari ini?</h3><p class="text-gray-500 text-sm text-center mb-8">Pilih gejala yang Anda rasakan.</p><div class="grid grid-cols-3 gap-4 mb-8" id="symptoms-grid"></div><button onclick="submitSymptoms()" class="w-full bg-[#1C4E2A] text-white py-4 rounded-full font-semibold text-sm shadow-md hover:bg-[#153a20] transition-colors active:scale-95">Lihat Rekomendasi</button></div>
+        </div>
+        <div id="symptoms-result-screen" class="app-screen hidden flex-1 bg-[#F0F7F2] flex-col h-full overflow-hidden">
+            <div class="flex items-center p-4 pt-6 bg-white shadow-sm z-10"><button onclick="navigateTo('symptoms-screen')" class="p-2 text-gray-700"><svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6" /></svg></button><h2 class="flex-1 text-center font-bold text-lg -ml-8">Hasil & Rekomendasi</h2></div>
+            <div class="p-6 flex-1 overflow-y-auto flex flex-col items-center"><div class="w-20 h-20 bg-white rounded-full flex items-center justify-center text-4xl shadow-md mb-4" id="result-emoji">🤧</div><h3 class="text-xl font-bold text-gray-800 mb-1" id="result-title">Gejala: </h3><div class="bg-white w-full rounded-2xl p-5 shadow-sm mt-6"><h4 class="font-bold text-[#1C4E2A] mb-3 flex items-center gap-2"><svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /></svg>Tindakan Disarankan</h4><ul class="text-sm text-gray-600 space-y-3"><li class="flex items-start gap-2"><span class="text-[#2B5D41] font-bold">•</span>Gunakan Sembura Herbal Spray 2-3 kali sehari.</li><li class="flex items-start gap-2"><span class="text-[#2B5D41] font-bold">•</span>Perbanyak minum air putih hangat.</li></ul></div><button onclick="navigateTo('home-screen')" class="w-full mt-auto bg-[#1C4E2A] text-white py-4 rounded-full font-semibold text-sm shadow-md hover:bg-[#153a20] transition-colors">Selesai</button></div>
         </div>
 
         <!-- ==================== BOTTOM NAVIGATION ==================== -->
@@ -407,6 +367,40 @@
             </button>
         </div>
 
+        <!-- ==================== MODAL PILIHAN EDIT ==================== -->
+        <div id="edit-options-modal" class="hidden absolute inset-0 z-[60] bg-black/40 flex flex-col justify-end">
+            <div class="bg-white rounded-t-3xl p-6 pb-10 transform transition-transform" id="edit-options-content">
+                <div class="w-12 h-1.5 bg-gray-300 rounded-full mx-auto mb-6"></div>
+                <h3 class="font-bold text-lg text-gray-800 mb-4">Edit Profil</h3>
+                
+                <!-- Input file disembunyikan, akan di-trigger dengan tombol di bawah -->
+                <input type="file" id="photo-upload" accept="image/*" class="hidden" onchange="handleFileSelect(event)">
+                
+                <button onclick="triggerPhotoUpload()" class="w-full text-left py-4 px-4 bg-gray-50 rounded-xl font-semibold text-gray-700 mb-3 flex items-center gap-3">
+                    <svg class="w-5 h-5 text-[#1C4E2A]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                    Ubah Foto Profil
+                </button>
+                <button onclick="editName()" class="w-full text-left py-4 px-4 bg-gray-50 rounded-xl font-semibold text-gray-700 flex items-center gap-3">
+                    <svg class="w-5 h-5 text-[#1C4E2A]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                    Ubah Nama
+                </button>
+                <button onclick="closeEditOptions()" class="w-full mt-6 py-4 rounded-xl font-bold text-gray-500 bg-gray-100">Batal</button>
+            </div>
+        </div>
+
+        <!-- ==================== MODAL CROPPER FOTO ==================== -->
+        <div id="crop-modal" class="hidden absolute inset-0 z-[70] cropper-modal flex flex-col text-white">
+            <div class="flex justify-between items-center p-4">
+                <button onclick="cancelCrop()" class="font-bold text-gray-300">Batal</button>
+                <span class="font-bold">Potong Foto</span>
+                <button onclick="applyCrop()" class="font-bold text-green-400">Selesai</button>
+            </div>
+            <!-- Area Crop (harus flex-1 agar memenuhi ruang sisa) -->
+            <div class="flex-1 w-full flex items-center justify-center overflow-hidden bg-black relative">
+                <img id="image-to-crop" src="" alt="Picture to crop" class="max-w-full max-h-full block">
+            </div>
+        </div>
+
     </div>
 
     <!-- ==================== LOGIKA JAVASCRIPT ==================== -->
@@ -415,12 +409,14 @@
         const timeStr = new Date().toLocaleTimeString('id-ID', {hour: '2-digit', minute:'2-digit'});
         document.getElementById('current-time').innerText = 'Hari Ini, ' + timeStr;
 
+        // --- VARIABEL PROFIL ---
+        let currentUserName = "Hanum";
+
         // --- SISTEM KAMERA ---
         let cameraStream = null;
 
         function startCamera() {
             const video = document.getElementById('camera-stream');
-            // Meminta akses kamera belakang (environment)
             if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
                 navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
                     .then(function(stream) {
@@ -448,30 +444,25 @@
         const mainTabs = ['home-screen', 'history-screen', 'scan-screen', 'article-screen', 'account-screen'];
 
         function navigateTo(screenId) {
-            // Sembunyikan semua layar
             const screens = document.querySelectorAll('.app-screen');
             screens.forEach(s => {
                 s.classList.add('hidden');
                 s.classList.remove('flex');
             });
 
-            // Atur Kamera
             if (screenId === 'scan-screen') {
                 startCamera();
             } else {
                 stopCamera();
             }
 
-            // Tampilkan layar tujuan
             const target = document.getElementById(screenId);
             target.classList.remove('hidden');
             target.classList.add('flex');
 
-            // Atur Navigasi Bawah
             const bottomNav = document.getElementById('bottom-nav');
             if (mainTabs.includes(screenId)) {
                 bottomNav.classList.remove('hidden');
-                // Otomatis aktifkan tab Home jika berasal dari halaman dalam
                 if (screenId === 'home-screen') {
                     const homeBtn = document.querySelector('.nav-btn');
                     updateTabUI(homeBtn);
@@ -495,7 +486,7 @@
             element.classList.add('text-[#1C4E2A]');
         }
 
-        // --- DATA & LOGIKA ARTIKEL ---
+        // --- LOGIKA ARTIKEL ---
         const articlesData = [
             {
                 title: "Manfaat Daun Sembung untuk Pernapasan",
@@ -517,7 +508,6 @@
         function renderArticles() {
             const articleList = document.getElementById('article-list');
             articleList.innerHTML = '';
-            
             articlesData.forEach(article => {
                 articleList.innerHTML += `
                     <div onclick="showToast('Membuka artikel...', 'success')" class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden cursor-pointer hover:shadow-md transition-shadow">
@@ -582,11 +572,11 @@
                 `;
             });
         }
-        renderSymptoms(); // Inisialisasi awal
+        renderSymptoms(); 
 
         function selectSymptom(index) {
             selectedSymptomIndex = index;
-            renderSymptoms(); // Render ulang dengan styling terpilih
+            renderSymptoms(); 
         }
 
         function submitSymptoms() {
@@ -605,6 +595,93 @@
             setTimeout(() => {
                 navigateTo('home-screen');
             }, 1200);
+        }
+
+        // --- LOGIKA EDIT PROFIL (NAMA & FOTO) ---
+        let cropper; // Menyimpan instance cropper
+
+        function openEditOptions() {
+            document.getElementById('edit-options-modal').classList.remove('hidden');
+        }
+
+        function closeEditOptions() {
+            document.getElementById('edit-options-modal').classList.add('hidden');
+        }
+
+        function editName() {
+            closeEditOptions();
+            const newName = prompt("Masukkan nama baru:", currentUserName);
+            if (newName && newName.trim() !== "") {
+                currentUserName = newName.trim();
+                document.getElementById('profile-name').innerText = currentUserName;
+                // Update juga nama di header Beranda
+                document.getElementById('home-greeting-name').innerText = currentUserName;
+                showToast("Nama berhasil diubah", "success");
+            }
+        }
+
+        function triggerPhotoUpload() {
+            closeEditOptions();
+            document.getElementById('photo-upload').click();
+        }
+
+        // Mengatur file foto baru yang diunggah
+        function handleFileSelect(event) {
+            const file = event.target.files[0];
+            if (file) {
+                // Baca file foto yang dipilih menggunakan FileReader
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const imgUrl = e.target.result;
+                    // Buka modal crop dan oper gambar yang mau dicrop
+                    openCropModal(imgUrl);
+                };
+                reader.readAsDataURL(file);
+            }
+            // Reset input file agar dapat memilih file yang sama lagi
+            event.target.value = '';
+        }
+
+        function openCropModal(imgUrl) {
+            document.getElementById('crop-modal').classList.remove('hidden');
+            const imageEl = document.getElementById('image-to-crop');
+            imageEl.src = imgUrl;
+
+            // Inisialisasi Cropper.js dengan Rasio Kunci 1:1 (Persegi sempurna)
+            cropper = new Cropper(imageEl, {
+                aspectRatio: 1,       // Mengunci rasio potong menjadi 1:1
+                viewMode: 1,          // Mengunci area potong dalam batas gambar
+                background: false,
+                autoCropArea: 0.8,
+            });
+        }
+
+        function cancelCrop() {
+            document.getElementById('crop-modal').classList.add('hidden');
+            if (cropper) {
+                cropper.destroy();
+                cropper = null;
+            }
+        }
+
+        function applyCrop() {
+            if (!cropper) return;
+            
+            // Dapatkan Data Base64 Canvas hasil cropping
+            const canvas = cropper.getCroppedCanvas({
+                width: 400,
+                height: 400
+            });
+
+            if (canvas) {
+                const croppedImageDataURL = canvas.toDataURL("image/jpeg");
+                // Update elemen profil gambar
+                document.getElementById('profile-img').src = croppedImageDataURL;
+                showToast("Foto profil berhasil diperbarui", "success");
+            }
+            
+            // Tutup dan bersihkan modal
+            cancelCrop();
         }
 
     </script>
